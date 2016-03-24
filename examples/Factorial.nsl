@@ -13,7 +13,7 @@ function fact($n)
   return $n * fact($n - 1);
 }
 
-section Fib()
+section Factorial()
 {
   #define Factorial 4
   DetailPrint("fact(".Factorial.") = ".fact(Factorial));

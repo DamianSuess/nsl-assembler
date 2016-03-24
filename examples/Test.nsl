@@ -5,4 +5,16 @@ RequestExecutionLevel("admin");
 
 section Test()
 {
+if (MessageBox("MB_YESNO", "Click Yes or No...") == "IDYES")
+  DetailPrint("You clicked Yes!");
+switch (MessageBox("MB_YESNO", "Click Yes or No...") == "IDYES")
+{
+  case true:
+    DetailPrint("You clicked Yes!");
+    break;
+  case false:
+    DetailPrint("You clicked No!");
+    break;
+}
+
 }
