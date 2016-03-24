@@ -1,11 +1,16 @@
-Release Notes
-------------------------------------------------------------------------
+# Release Notes
 
 This installs the nsL Assembler to the NSIS directory and adds a Compile
 nsL Script right click option to .nsl files. NSIS must be installed
 prior to installing the nsL Assembler.
 
-Alpha Releases
+# Build
+
+1. Clone repository `git clone https://github.com/NSIS-Dev/nsl-assembler nsL`
+2. Change directory `cd nsL``
+3. Build JAR `ant jar`
+
+# Alpha Releases
 ------------------------------------------------------------------------
 
 1.0.3 - 18th April 2011
