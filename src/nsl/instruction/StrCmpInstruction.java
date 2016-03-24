@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import nsl.*;
 import nsl.expression.*;
-import nsl.statement.SwitchCaseStatement;
 
 /**
  * @author Stuart
@@ -39,7 +38,7 @@ public class StrCmpInstruction extends JumpExpression
     this.str1 = paramsList.get(0);
     this.str2 = paramsList.get(1);
 
-    if (this.str1.isLiteral() && !this.str1.getType().equals(ExpressionType.Register) && this.str2.isLiteral() && !this.str2.getType().equals(ExpressionType.Register))
+    if (this.str1.isLiteral() && this.str1.getType() != ExpressionType.Register && this.str2.isLiteral() && this.str2.getType() != ExpressionType.Register)
       throw new NslException("\"StrCmp\" instruction used with literals for both arguments; use the \"==s\" or \"!=s\" equality operators instead", true);
 
     this.type = ExpressionType.Boolean;
@@ -67,10 +66,7 @@ public class StrCmpInstruction extends JumpExpression
 
     Expression varOrStr1 = AssembleExpression.getRegisterOrExpression(this.str1);
     Expression varOrStr2 = AssembleExpression.getRegisterOrExpression(this.str2);
-    if (this.booleanValue)
-      ScriptParser.writeLine(name + " " + varOrStr1 + " " + varOrStr2 + " 0 +3");
-    else
-      ScriptParser.writeLine(name + " " + varOrStr1 + " " + varOrStr2 + " +3");
+    ScriptParser.writeLine(name + " " + varOrStr1 + " " + varOrStr2 + " 0 +3");
     ScriptParser.writeLine("StrCpy " + var + " true");
     ScriptParser.writeLine("Goto +2");
     ScriptParser.writeLine("StrCpy " + var + " false");
@@ -97,39 +93,5 @@ public class StrCmpInstruction extends JumpExpression
       ScriptParser.writeLine(name + " " + varOrStr1 + " " + varOrStr2 + " " + gotoB + " " + gotoA);
     varOrStr1.setInUse(false);
     varOrStr2.setInUse(false);
-  }
-
-  /**
-   * Assembles the source code.
-   * @param switchCases a list of {@link SwitchCaseStatement} in the switch
-   * statement
-   * statement that this {@code JumpExpression} is being switched on.
-   */
-  public void assemble(ArrayList<SwitchCaseStatement> switchCases) throws IOException
-  {
-    if (this.thrownAwayAfterOptimise != null)
-      AssembleExpression.assembleIfRequired(this.thrownAwayAfterOptimise);
-
-    String gotoA = "";
-    String gotoB = "";
-
-    for (SwitchCaseStatement caseStatement : switchCases)
-    {
-      if (caseStatement.getMatch().getBooleanValue() == this.booleanValue)
-      {
-        if (gotoA.isEmpty())
-          gotoA = " " + caseStatement.getLabel();
-      }
-      else
-      {
-        if (gotoB.isEmpty())
-          gotoB = " " + caseStatement.getLabel();
-      }
-    }
-
-    if (gotoA.isEmpty())
-      gotoA = " 0";
-
-    ScriptParser.writeLine(name + gotoA + gotoB);
   }
 }

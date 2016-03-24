@@ -128,7 +128,7 @@ public class ScriptParser
         if (ex instanceof NslException)
           stderr.println(ex.getMessage());
         else
-          ex.printStackTrace(stderr);
+          stderr.println(ex);
 
         if (!noPauseOnError)
           System.in.read();

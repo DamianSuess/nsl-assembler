@@ -1,7 +1,7 @@
 OutFile("Defines.exe");
-ShowInstDetails("show");
 XPStyle("on");
 RequestExecutionLevel("admin");
+ShowInstDetails("show");
 
 section Test()
 {

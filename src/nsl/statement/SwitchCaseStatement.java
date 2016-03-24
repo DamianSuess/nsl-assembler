@@ -15,7 +15,6 @@ import nsl.expression.*;
 public class SwitchCaseStatement extends Statement
 {
   private final Expression match;
-  private final int lineNo;
   private Label label;
 
   /**
@@ -24,12 +23,9 @@ public class SwitchCaseStatement extends Statement
    */
   public SwitchCaseStatement()
   {
-    this.lineNo = ScriptParser.tokenizer.lineno();
+    ScriptParser.tokenizer.match("case");
     this.match = Expression.match();
     ScriptParser.tokenizer.matchOrDie(':');
-
-    if (!ExpressionType.isBoolean(this.match) && !ExpressionType.isInteger(this.match) && !ExpressionType.isString(this.match))
-      throw new NslException("\"case\" in a \"switch\" statement requires a literal string, Boolean or integer value", true);
   }
 
   /**
@@ -48,15 +44,6 @@ public class SwitchCaseStatement extends Statement
   public Label getLabel()
   {
     return this.label;
-  }
-
-  /**
-   * Gets the line number of this case statement.
-   * @return the line number of this case statement
-   */
-  public int getLineNo()
-  {
-    return this.lineNo;
   }
 
   /**

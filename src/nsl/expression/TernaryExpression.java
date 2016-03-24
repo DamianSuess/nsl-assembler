@@ -29,7 +29,7 @@ public class TernaryExpression extends AssembleExpression
     this.ifTrue = ifTrue;
     this.ifFalse = ifFalse;
 
-    if (!(leftOperand instanceof BooleanExpression) && !(leftOperand instanceof ComparisonExpression) && !leftOperand.getType().equals(ExpressionType.Boolean))
+    if (!(leftOperand instanceof BooleanExpression) && !(leftOperand instanceof ComparisonExpression) && leftOperand.getType() != ExpressionType.Boolean)
       throw new NslException("The left operand must be an equality or relational expression", true);
   }
 

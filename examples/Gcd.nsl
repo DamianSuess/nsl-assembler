@@ -1,7 +1,5 @@
-OutFile("Gcd.exe");
+OutFile("Test.exe");
 ShowInstDetails("show");
-XPStyle("on");
-RequestExecutionLevel("admin");
 
 /*
   Modified from http://en.wikipedia.org/wiki/Binary_GCD_algorithm

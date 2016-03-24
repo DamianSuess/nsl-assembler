@@ -36,7 +36,7 @@ public class FileReadInstruction extends AssembleExpression
       throw new NslArgumentException(name, 1, 2);
 
     this.handle = paramsList.get(0);
-    if (!this.handle.getType().equals(ExpressionType.Register))
+    if (this.handle.getType() != ExpressionType.Register)
       throw new NslArgumentException(name, 1, ExpressionType.Register);
 
     if (paramsCount > 1)

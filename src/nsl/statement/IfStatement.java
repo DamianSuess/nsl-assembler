@@ -29,8 +29,6 @@ public class IfStatement extends Statement
 
     ScriptParser.tokenizer.matchOrDie('(');
     this.booleanExpression = Expression.matchComplex();
-    if (!this.booleanExpression.getType().equals(ExpressionType.Boolean))
-      throw new NslException("An \"if\" statement requires a Boolean expression", true);
     ScriptParser.tokenizer.matchOrDie(')');
 
     this.blockStatement = new BlockStatement();
@@ -78,13 +76,9 @@ public class IfStatement extends Statement
       }
 
       Label gotoA = LabelList.getCurrent().getNext();
-      gotoA.setNotUsed(true);
       Label gotoB;
       if (this.elseStatement != null || gotoEnd == null)
-      {
         gotoB = LabelList.getCurrent().getNext();
-        gotoB.setNotUsed(true);
-      }
       else
         gotoB = gotoEnd;
 
@@ -115,7 +109,7 @@ public class IfStatement extends Statement
   @Override
   public void assemble() throws IOException
   {
-    //if (!this.blockStatement.isEmpty())
+    if (!this.blockStatement.isEmpty())
     {
       if (this.booleanExpression != null && this.booleanExpression.isLiteral())
       {
@@ -133,7 +127,6 @@ public class IfStatement extends Statement
         if (this.elseStatement != null)
         {
           Label gotoEnd = LabelList.getCurrent().getNext();
-          gotoEnd.setNotUsed(true);
           this.assemble(gotoEnd);
           gotoEnd.write();
         }

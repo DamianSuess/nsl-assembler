@@ -52,7 +52,7 @@ public class SectionInInstruction extends AssembleExpression
     for (Expression param : this.paramsList)
     {
       AssembleExpression.assembleIfRequired(param);
-      if (param.getType().equals(ExpressionType.Boolean) && param.getBooleanValue() == true)
+      if (param.getType() == ExpressionType.Boolean && param.getBooleanValue() == true)
         write += " RO";
       else
         write += " " + param;

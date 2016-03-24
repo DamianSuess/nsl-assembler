@@ -47,7 +47,6 @@ public class Expression
    */
   protected Expression()
   {
-    this.type = ExpressionType.Other;
   }
 
   /**
@@ -260,16 +259,16 @@ public class Expression
   private static Expression createMathematical(Expression left, String operator, Expression right)
   {
     // Matched registers. Check their scope.
-    if (left.type.equals(ExpressionType.Register))
+    if (left.type == ExpressionType.Register)
       Scope.getCurrent().check(left.integerValue);
-    if (right.type.equals(ExpressionType.Register))
+    if (right.type == ExpressionType.Register)
       Scope.getCurrent().check(right.integerValue);
 
     // Left and right are literals.
     if (left.isLiteral() && right.isLiteral())
     {
       // Should not be using mathematical operators on Boolean values.
-      if (left.type.equals(ExpressionType.Boolean) || right.type.equals(ExpressionType.Boolean))
+      if (left.type == ExpressionType.Boolean || right.type == ExpressionType.Boolean)
         NslException.printWarning("\"" + operator + "\" operator used with a Boolean operand");
 
       // Should not be using mathematical operators on string values.
@@ -277,7 +276,7 @@ public class Expression
         NslException.printWarning("\"" + operator + "\" operator used with a string operand");
 
       // Integer types.
-      if (left.type.equals(ExpressionType.Integer) && right.type.equals(ExpressionType.Integer))
+      if (left.type == ExpressionType.Integer && right.type == ExpressionType.Integer)
       {
         if (operator.equals("+"))
           return Expression.fromInteger(left.integerValue + right.integerValue);
@@ -286,11 +285,7 @@ public class Expression
         if (operator.equals("*"))
           return Expression.fromInteger(left.integerValue * right.integerValue);
         if (operator.equals("/"))
-        {
-          if (right.integerValue == 0)
-            throw new NslException("Division by zero", true);
           return Expression.fromInteger(left.integerValue / right.integerValue);
-        }
         if (operator.equals("%"))
           return Expression.fromInteger(left.integerValue % right.integerValue);
         if (operator.equals("|"))
@@ -322,27 +317,25 @@ public class Expression
   private static Expression createComparison(Expression left, String operator, Expression right, ComparisonType comparisonType)
   {
     // Matched registers. Check their scope.
-    if (left.type.equals(ExpressionType.Register))
+    if (left.type == ExpressionType.Register)
       Scope.getCurrent().check(left.integerValue);
-    if (right.type.equals(ExpressionType.Register))
+    if (right.type == ExpressionType.Register)
       Scope.getCurrent().check(right.integerValue);
 
     // Left and right are literals.
     if (left.isLiteral() && right.isLiteral())
     {
-      if (left.type.equals(ExpressionType.Boolean) || right.type.equals(ExpressionType.Boolean))
+      // Should not be using these operators on Boolean values.
+      if (left.type == ExpressionType.Boolean || right.type == ExpressionType.Boolean)
       {
-        // Should not be using these operators on Boolean values.
         if (operator.equals(">") || operator.equals(">=") || operator.equals("<") || operator.equals("<="))
           NslException.printWarning("\"" + operator + "\" operator used with a Boolean operand");
-        else
-          comparisonType = ComparisonType.String;
       }
 
       // Integer types.
-      if (left.type.equals(ExpressionType.Integer) && right.type.equals(ExpressionType.Integer))
+      if (left.type == ExpressionType.Integer && right.type == ExpressionType.Integer)
       {
-        if (comparisonType.equals(ComparisonType.IntegerUnsigned))
+        if (comparisonType == ComparisonType.IntegerUnsigned)
         {
           left.integerValue = Math.abs(left.integerValue);
           right.integerValue = Math.abs(right.integerValue);
@@ -362,7 +355,7 @@ public class Expression
           return Expression.fromBoolean(left.integerValue <= right.integerValue);
       }
       // Boolean types.
-      else if (left.type.equals(ExpressionType.Boolean) && right.type.equals(ExpressionType.Boolean))
+      else if (left.type == ExpressionType.Boolean && right.type == ExpressionType.Boolean)
       {
         if (operator.equals("=="))
           return Expression.fromBoolean(left.booleanValue == right.booleanValue);
@@ -372,7 +365,7 @@ public class Expression
       // String types.
       else if (ExpressionType.isString(left) && ExpressionType.isString(right))
       {
-        if (comparisonType.equals(ComparisonType.StringCaseSensitive))
+        if (comparisonType == ComparisonType.StringCaseSensitive)
         {
           if (operator.equals("=="))
             return Expression.fromBoolean(left.toString(true).equals(right.toString(true)));
@@ -404,34 +397,6 @@ public class Expression
         }
       }
     }
-    else if (ExpressionType.isBoolean(left))
-    {
-      if (operator.equals("==") && left.booleanValue == false && right.type == ExpressionType.Boolean)
-      {
-        right.booleanValue = !right.booleanValue;
-        return left;
-      }
-      if (operator.equals("!=") && left.booleanValue == true && right.type == ExpressionType.Boolean)
-      {
-        right.booleanValue = !right.booleanValue;
-        return left;
-      }
-      comparisonType = ComparisonType.String;
-    }
-    else if (ExpressionType.isBoolean(right))
-    {
-      if (operator.equals("==") && right.booleanValue == false && left.type == ExpressionType.Boolean)
-      {
-        left.booleanValue = !left.booleanValue;
-        return left;
-      }
-      if (operator.equals("!=") && right.booleanValue == true && left.type == ExpressionType.Boolean)
-      {
-        left.booleanValue = !left.booleanValue;
-        return right;
-      }
-      comparisonType = ComparisonType.String;
-    }
 
     return new ComparisonExpression(left, operator, right, comparisonType);
   }
@@ -446,33 +411,22 @@ public class Expression
   private static Expression createBoolean(Expression left, String operator, Expression right)
   {
     // Matched registers. Check their scope.
-    if (left.type.equals(ExpressionType.Register))
+    if (left.type == ExpressionType.Register)
       Scope.getCurrent().check(left.integerValue);
-    if (right.type.equals(ExpressionType.Register))
+    if (right.type == ExpressionType.Register)
       Scope.getCurrent().check(right.integerValue);
 
     // Left and right are literals. If both are also Boolean, we can evaluate
     // now.
     if (left.isLiteral() && right.isLiteral())
     {
-      if (left.type.equals(ExpressionType.Boolean) && right.type.equals(ExpressionType.Boolean))
+      if (left.type == ExpressionType.Boolean && right.type == ExpressionType.Boolean)
       {
         if (operator.equals("&&"))
           return Expression.fromBoolean(left.booleanValue && right.booleanValue);
         if (operator.equals("||"))
           return Expression.fromBoolean(left.booleanValue || right.booleanValue);
       }
-    }
-    else if (right.isLiteral())
-    {
-      // If the right operand is a literal true and the operator is && then we can
-      // discard the right operand.
-      if (operator.equals("&&") && right.type.equals(ExpressionType.Boolean) && right.booleanValue == true)
-        return left;
-      // If the right operand is a literal false and the operator is || then we
-      // can discard the right operand.
-      if (operator.equals("||") && right.type.equals(ExpressionType.Boolean) && right.booleanValue == false)
-        return left;
     }
 
     return new BooleanExpression(left, operator, right);
@@ -487,15 +441,15 @@ public class Expression
   private static Expression createConcatenation(Expression left, Expression right)
   {
     // Matched registers. Check their scope.
-    if (left.type.equals(ExpressionType.Register))
+    if (left.type == ExpressionType.Register)
       Scope.getCurrent().check(left.integerValue);
-    if (right.type.equals(ExpressionType.Register))
+    if (right.type == ExpressionType.Register)
       Scope.getCurrent().check(right.integerValue);
 
     // Left and right are literals; concatenate them.
     if (left.isLiteral() && right.isLiteral())
     {
-      if (left.type.equals(ExpressionType.StringSpecial) || right.type.equals(ExpressionType.StringSpecial))
+      if (left.type == ExpressionType.StringSpecial || right.type == ExpressionType.StringSpecial)
         return Expression.fromSpecialString(left.toString(true) + right.toString(true));
       return Expression.fromString(left.toString(true) + right.toString(true));
     }
@@ -513,16 +467,16 @@ public class Expression
   private static Expression createTernary(Expression left, Expression ifTrue, Expression ifFalse)
   {
     // Matched registers. Check their scope.
-    if (left.type.equals(ExpressionType.Register))
+    if (left.type == ExpressionType.Register)
       Scope.getCurrent().check(left.integerValue);
-    if (ifTrue.type.equals(ExpressionType.Register))
+    if (ifTrue.type == ExpressionType.Register)
       Scope.getCurrent().check(ifTrue.integerValue);
-    if (ifFalse.type.equals(ExpressionType.Register))
+    if (ifFalse.type == ExpressionType.Register)
       Scope.getCurrent().check(ifFalse.integerValue);
 
     if (left.isLiteral())
     {
-      if (left.type.equals(ExpressionType.Boolean))
+      if (left.type == ExpressionType.Boolean)
       {
         if (left.booleanValue == true)
           return ifTrue;
@@ -564,12 +518,12 @@ public class Expression
         // Negate the returned Boolean (logical) expression.
         if (logicalNegate)
         {
-          if (!left.type.equals(ExpressionType.Boolean))
+          if (left.getType() != ExpressionType.Boolean)
             throw new NslException("The \"!\" operator must be applied to a Boolean expression", true);
 
-          /*if (left instanceof ConditionalExpression)
+          if (left instanceof ConditionalExpression)
             ((ConditionalExpression)left).setNegate(true);
-          else */if (left.booleanValue)
+          else if (left.booleanValue)
             left.booleanValue = false;
           else
             left.booleanValue = true;
@@ -603,7 +557,7 @@ public class Expression
     // Negate the returned Boolean (logical) value.
     if (logicalNegate)
     {
-      if (!left.type.equals(ExpressionType.Boolean))
+      if (left.getType() != ExpressionType.Boolean)
         throw new NslException("The \"!\" operator must be applied to a Boolean expression", true);
 
       if (left.booleanValue)
@@ -628,7 +582,7 @@ public class Expression
     if (ScriptParser.tokenizer.tokenIsWord())
     {
       Expression value = DefineList.lookup(ScriptParser.tokenizer.sval);
-      if (value != null && value.type.equals(ExpressionType.StringSpecial) && value.booleanValue == true)
+      if (value != null && value.type == ExpressionType.StringSpecial && value.booleanValue == true)
       {
         String name = ScriptParser.tokenizer.sval;
         ScriptParser.tokenizer.tokenNext(); // Discard the constant name.
@@ -653,7 +607,7 @@ public class Expression
       // Match .= (assignment)
       if (ScriptParser.tokenizer.match('='))
       {
-        if (!left.type.equals(ExpressionType.Register))
+        if (left.getType() != ExpressionType.Register)
           throw new NslException("The left operand must be a variable", true);
 
         left = new AssignmentExpression(left.integerValue, createConcatenation(left, matchComplex()));
@@ -685,7 +639,7 @@ public class Expression
       // Match *=, /= or %= (assignment)
       if (ScriptParser.tokenizer.match('='))
       {
-        if (!left.type.equals(ExpressionType.Register))
+        if (left.getType() != ExpressionType.Register)
           throw new NslException("The left operand must be a variable", true);
 
         left = new AssignmentExpression(left.integerValue, createMathematical(left, operator, matchComplex()));
@@ -717,7 +671,7 @@ public class Expression
       // Match n++ or n--
       if (ScriptParser.tokenizer.match(operator.charAt(0)))
       {
-        if (!left.type.equals(ExpressionType.Register))
+        if (left.getType() != ExpressionType.Register)
           throw new NslException("The left operand must be a variable", true);
 
         left = new AssignmentExpression(left.integerValue, createMathematical(left, operator, Expression.fromInteger(1)));
@@ -726,7 +680,7 @@ public class Expression
       // Match += or -= (assignment)
       else if (ScriptParser.tokenizer.match('='))
       {
-        if (!left.type.equals(ExpressionType.Register))
+        if (left.getType() != ExpressionType.Register)
           throw new NslException("The left operand must be a variable", true);
 
         left = new AssignmentExpression(left.integerValue, createMathematical(left, operator, matchComplex()));
@@ -767,7 +721,7 @@ public class Expression
         // Match <<= (assignment)
         if (ScriptParser.tokenizer.match('='))
         {
-          if (!left.type.equals(ExpressionType.Register))
+          if (left.getType() != ExpressionType.Register)
             throw new NslException("The left operand must be a variable", true);
 
           left = new AssignmentExpression(left.integerValue, createMathematical(left, "<<", matchComplex()));
@@ -785,7 +739,7 @@ public class Expression
         // Match >>= (assignment)
         if (ScriptParser.tokenizer.match('='))
         {
-          if (!left.type.equals(ExpressionType.Register))
+          if (left.getType() != ExpressionType.Register)
             throw new NslException("The left operand must be a variable", true);
 
           left = new AssignmentExpression(left.integerValue, createMathematical(left, ">>", matchComplex()));
@@ -838,9 +792,9 @@ public class Expression
               leftComparisonExpression.getRightOperand().isLiteral())
           {
             JumpExpression jumpInstruction = (JumpExpression)(leftComparisonExpression).getLeftOperand();
-            if (jumpInstruction.optimise((leftComparisonExpression).getRightOperand(), operator))
+            if (jumpInstruction.optimise((leftComparisonExpression).getRightOperand()))
             {
-              if (leftComparisonExpression.booleanValue)
+              if (leftComparisonExpression.negate)
                 jumpInstruction.booleanValue = !jumpInstruction.booleanValue;
               left = jumpInstruction;
             }
@@ -850,9 +804,9 @@ public class Expression
               leftComparisonExpression.getLeftOperand().isLiteral())
           {
             JumpExpression jumpInstruction = (JumpExpression)(leftComparisonExpression).getRightOperand();
-            if (jumpInstruction.optimise((leftComparisonExpression).getLeftOperand(), operator))
+            if (jumpInstruction.optimise((leftComparisonExpression).getLeftOperand()))
             {
-              if (leftComparisonExpression.booleanValue)
+              if (leftComparisonExpression.negate)
                 jumpInstruction.booleanValue = !jumpInstruction.booleanValue;
               left = jumpInstruction;
             }
@@ -862,7 +816,7 @@ public class Expression
       // Match = (assignment)
       else if (operator.equals("="))
       {
-        if (!left.type.equals(ExpressionType.Register))
+        if (left.getType() != ExpressionType.Register)
           throw new NslException("The left operand must be a variable", true);
 
         left = new AssignmentExpression(left.integerValue, matchComplex());
@@ -874,8 +828,7 @@ public class Expression
   }
 
   /**
-   * Matches a logical (Boolean) AND (&&) expression or a binary AND (&)
-   * expression.
+   * Matches a logical (Boolean) AND (&&) expression or a binary AND (&) expression.
    * @return the expression
    */
   private static Expression matchLogicalAndOrBinaryAnd()
@@ -890,14 +843,14 @@ public class Expression
         if (ExpressionType.isBoolean(left) && left.booleanValue == false)
         {
           // Evaluated to false; we need not evaluate anything up until the next
-          // ||, ) or ;.
+          // || or ).
           while (ScriptParser.tokenizer.tokenNext("\")\""))
           {
             if (ScriptParser.tokenizer.tokenIs('('))
               while (ScriptParser.tokenizer.tokenNext("\")\""))
                 if (ScriptParser.tokenizer.match(')'))
                   break;
-            if (ScriptParser.tokenizer.tokenIs(')') || ScriptParser.tokenizer.tokenIs('|') || ScriptParser.tokenizer.tokenIs(';'))
+            if (ScriptParser.tokenizer.tokenIs(')') || ScriptParser.tokenizer.tokenIs('|'))
               break;
           }
         }
@@ -909,7 +862,7 @@ public class Expression
       // Match &= (assignment)
       else if (ScriptParser.tokenizer.match('='))
       {
-        if (!left.type.equals(ExpressionType.Register))
+        if (left.getType() != ExpressionType.Register)
           throw new NslException("The left operand must be a variable", true);
 
         left = new AssignmentExpression(left.integerValue, createMathematical(left, "&", matchComplex()));
@@ -938,7 +891,7 @@ public class Expression
       // Match ^= (assignment)
       if (ScriptParser.tokenizer.match('='))
       {
-        if (!left.type.equals(ExpressionType.Register))
+        if (left.getType() != ExpressionType.Register)
           throw new NslException("The left operand must be a variable", true);
 
         left = new AssignmentExpression(left.integerValue, createMathematical(left, "^", matchComplex()));
@@ -955,8 +908,7 @@ public class Expression
   }
 
   /**
-   * Matches a logical (Boolean) OR (||) expression or a binary inclusive OR (|)
-   * expression.
+   * Matches a logical (Boolean) OR (||) expression or a binary inclusive OR (|) expression.
    * @return the expression
    */
   private static Expression matchLogicalOrOrBinaryInclusiveOr()
@@ -971,8 +923,8 @@ public class Expression
         if (ExpressionType.isBoolean(left) && left.booleanValue == true)
         {
           // Evaluated to true; we can ignore the rest of the expression.
-          while (ScriptParser.tokenizer.tokenNext("\")\" or \";\""))
-            if (ScriptParser.tokenizer.tokenIs(')') || ScriptParser.tokenizer.tokenIs(';'))
+          while (ScriptParser.tokenizer.tokenNext("\")\""))
+            if (ScriptParser.tokenizer.tokenIs(')'))
               break;
         }
         else
@@ -983,7 +935,7 @@ public class Expression
       // Match |= (assignment)
       else if (ScriptParser.tokenizer.match('='))
       {
-        if (!left.type.equals(ExpressionType.Register))
+        if (left.getType() != ExpressionType.Register)
           throw new NslException("The left operand must be a variable", true);
 
         left = new AssignmentExpression(left.integerValue, createMathematical(left, "|", matchComplex()));
@@ -1027,7 +979,7 @@ public class Expression
     Expression expression = matchTernary();
 
     // Matched a register that isn't being assigned to. Check its scope.
-    if (!(expression instanceof AssembleExpression) && expression.type.equals(ExpressionType.Register))
+    if (!(expression instanceof AssembleExpression) && expression.type == ExpressionType.Register)
       Scope.getCurrent().check(expression.integerValue);
 
     return expression;
@@ -1091,7 +1043,7 @@ public class Expression
         defaultValue = null;
 
       // String literals are parsed as plain integers or as hexadecimal (0x...).
-      if (value.type.equals(ExpressionType.String) || value.type.equals(ExpressionType.StringSpecial))
+      if (value.type == ExpressionType.String || value.type == ExpressionType.StringSpecial)
       {
         String stringValue = value.toString(true);
         try
@@ -1108,19 +1060,19 @@ public class Expression
         return defaultValue == null ? Expression.fromInteger(0) : defaultValue;
       }
       // Boolean true == 1, false == 0.
-      else if (value.type.equals(ExpressionType.Boolean))
+      else if (value.type == ExpressionType.Boolean)
       {
         if (value.booleanValue == true)
           return Expression.fromInteger(1);
         return defaultValue == null ? Expression.fromInteger(0) : defaultValue;
       }
       // No conversion needed for an integer literal.
-      else if (value.type.equals(ExpressionType.Integer))
+      else if (value.type == ExpressionType.Integer)
       {
         return value;
       }
       // For a register or NSIS constant, we return the internal index.
-      else if (value.type.equals(ExpressionType.Register) || value.type.equals(ExpressionType.Constant))
+      else if (value.type == ExpressionType.Register || value.type == ExpressionType.Constant)
       {
         return Expression.fromInteger(value.integerValue);
       }
@@ -1304,7 +1256,7 @@ public class Expression
     if (value != null)
     {
       // Late evaluation constant or a function or plug-in call follows.
-      if (value.type.equals(ExpressionType.StringSpecial) && value.booleanValue == true || ScriptParser.tokenizer.tokenIs('('))
+      if (value.type == ExpressionType.StringSpecial && value.booleanValue == true || ScriptParser.tokenizer.tokenIs('('))
       {
         ScriptParser.pushTokenizer(new Tokenizer(new StringReader(value.toString(true)), "constant \"" + name + "\""));
         if (returns == 0)
@@ -1343,7 +1295,7 @@ public class Expression
             value = macro.evaluate(paramsList, returns);
 
             // Late evaluation constant was returned.
-            if (value.type.equals(ExpressionType.StringSpecial) && value.booleanValue == true)
+            if (value.type == ExpressionType.StringSpecial && value.booleanValue == true)
             {
               ScriptParser.pushTokenizer(new Tokenizer(new StringReader(value.stringValue), "macro \"" + name + "\""));
               if (returns == 0)
@@ -1386,7 +1338,7 @@ public class Expression
   public static Expression findRegister(ArrayList<Expression> search, Expression find)
   {
     for (Expression var : search)
-      if (var.type.equals(ExpressionType.Register) && find.integerValue == var.integerValue)
+      if (var.type == ExpressionType.Register && find.integerValue == var.integerValue)
         return var;
     return null;
   }
@@ -1413,7 +1365,7 @@ public class Expression
    */
   public static Expression findRegister(HashMap<Integer, Expression> search, Expression find)
   {
-    if (find.type.equals(ExpressionType.Register))
+    if (find.type == ExpressionType.Register)
       return search.get(Integer.valueOf(find.integerValue));
     return null;
   }
@@ -1507,7 +1459,7 @@ public class Expression
         return Boolean.toString(this.booleanValue);
     }
     
-    return "?";
+    return "??";
   }
 
   /**
@@ -1551,7 +1503,7 @@ public class Expression
       while (true)
       {
         Expression expression = match();
-        if (!expression.type.equals(ExpressionType.Register))
+        if (expression.type != ExpressionType.Register)
           throw new NslExpectedException("Expected a register/variable");
 
         expressionList.add(expression);

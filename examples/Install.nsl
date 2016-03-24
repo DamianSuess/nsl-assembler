@@ -1,4 +1,4 @@
-#define Version '1.0.2'
+#define Version '1.0.1'
 
 Name("nsL Assembler ".Version." (Alpha)");
 OutFile("nsL-Assembler-".Version.".exe");

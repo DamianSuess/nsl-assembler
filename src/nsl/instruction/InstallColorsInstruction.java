@@ -63,7 +63,7 @@ public class InstallColorsInstruction extends AssembleExpression
   {
     AssembleExpression.assembleIfRequired(this.value1);
 
-    if (this.value1.getType().equals(ExpressionType.Boolean))
+    if (this.value1.getType() == ExpressionType.Boolean)
     {
       if (this.value2 != null)
         AssembleExpression.assembleIfRequired(this.value2);

@@ -89,14 +89,14 @@ public class ComparisonExpression extends ConditionalExpression
       if (comparisonType == ComparisonType.IntegerUnsigned)
         ScriptParser.writeLine(String.format("IntCmpU %s %s %s %s %s", leftOperand, rightOperand, gotoB, gotoA, gotoB));
       else
-        ScriptParser.writeLine(String.format("IntCmp %s %s %s %s %s", leftOperand, rightOperand, gotoB, gotoA, gotoB));
+        ScriptParser.writeLine(String.format("IntCmp %s %s %s %s %s", leftOperand, rightOperand, gotoA, gotoB, gotoA));
     }
     else if (operator.equals(">"))
     {
       if (comparisonType == ComparisonType.IntegerUnsigned)
         ScriptParser.writeLine(String.format("IntCmpU %s %s %s %s %s", leftOperand, rightOperand, gotoB, gotoB, gotoA));
       else
-        ScriptParser.writeLine(String.format("IntCmp %s %s %s %s %s", leftOperand, rightOperand, gotoB, gotoB, gotoA));
+        ScriptParser.writeLine(String.format("IntCmp %s %s %s %s %s", leftOperand, rightOperand, gotoA, gotoB, gotoA));
     }
     else
       throw new NslException("Unknown operator " + operator);
@@ -108,17 +108,9 @@ public class ComparisonExpression extends ConditionalExpression
    */
   public void assemble(Register var) throws IOException
   {
-    Label gotoA = LabelList.getCurrent().getNext();
-    Label gotoB = LabelList.getCurrent().getNext();
-
-    if (this.booleanValue)
-      this.assemble(gotoB, gotoA);
-    else
-      this.assemble(gotoA, gotoB);
-    gotoA.write();
+    this.assemble(new RelativeJump("0"), new RelativeJump("+3"));
     ScriptParser.writeLine("StrCpy " + var + " true");
     ScriptParser.writeLine("Goto +2");
-    gotoB.write();
     ScriptParser.writeLine("StrCpy " + var + " false");
   }
 
@@ -129,7 +121,7 @@ public class ComparisonExpression extends ConditionalExpression
    */
   public void assemble(Label gotoA, Label gotoB) throws IOException
   {
-    if (this.booleanValue)
+    if (this.negate)
     {
       Label gotoTemp = gotoA;
       gotoA = gotoB;

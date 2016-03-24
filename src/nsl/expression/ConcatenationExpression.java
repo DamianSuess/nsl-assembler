@@ -30,7 +30,7 @@ public class ConcatenationExpression extends LogicalExpression
   {
     super(leftOperand, new Operator(".", OperatorType.Mathematical), rightOperand);
 
-    if (leftOperand.type.equals(ExpressionType.StringSpecial) || rightOperand.type.equals(ExpressionType.StringSpecial))
+    if (leftOperand.type == ExpressionType.StringSpecial || rightOperand.type == ExpressionType.StringSpecial)
       this.type = ExpressionType.StringSpecial;
     else
       this.type = ExpressionType.String;

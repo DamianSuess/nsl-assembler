@@ -15,8 +15,7 @@ public enum ExpressionType
   Integer,
   Boolean,
   Register,
-  Constant,
-  Other;
+  Constant;
 
   /**
    * Returns <code>true</code> if the given expression is a literal string
@@ -26,7 +25,7 @@ public enum ExpressionType
    */
   public static boolean isString(Expression expression)
   {
-    return expression.isLiteral() && (expression.type.equals(ExpressionType.String) || expression.type.equals(ExpressionType.StringSpecial));
+    return expression.isLiteral() && expression.type == ExpressionType.String || expression.type == ExpressionType.StringSpecial;
   }
 
   /**
@@ -37,7 +36,7 @@ public enum ExpressionType
    */
   public static boolean isBoolean(Expression expression)
   {
-    return expression.isLiteral() && expression.type.equals(ExpressionType.Boolean);
+    return expression.isLiteral() && expression.type == ExpressionType.Boolean;
   }
 
   /**
@@ -48,7 +47,7 @@ public enum ExpressionType
    */
   public static boolean isRegister(Expression expression)
   {
-    return expression.isLiteral() && expression.type.equals(ExpressionType.Register);
+    return expression.isLiteral() && expression.type == ExpressionType.Register;
   }
 
   /**
@@ -59,7 +58,7 @@ public enum ExpressionType
    */
   public static boolean isInteger(Expression expression)
   {
-    return expression.isLiteral() && expression.type.equals(ExpressionType.Integer);
+    return expression.isLiteral() && expression.type == ExpressionType.Integer;
   }
   
   /**
@@ -74,16 +73,12 @@ public enum ExpressionType
       case String:
         return "a string";
       case StringSpecial:
-        return "a string";
+        return "an unquoted string";
       case Integer:
         return "an integer";
-      case Boolean:
-        return "a Boolean";
       case Register:
-        return "a register/variable";
-      case Constant:
-        return "an NSIS constant";
+        return "a variable";
     }
-    return "Other";
+    return "??";
   }
 }
