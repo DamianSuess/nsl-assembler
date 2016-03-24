@@ -1,6 +1,5 @@
 sudo: false
 language: java
-install: ant deps
 script: ant test
 notifications:
   email: false
