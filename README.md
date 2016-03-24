@@ -6,8 +6,10 @@ prior to installing the nsL Assembler.
 
 # Build
 
+The only pre-requistes for building are [Java][java] and [Ant][ant].
+
 1. Clone repository `git clone https://github.com/NSIS-Dev/nsl-assembler nsL`
-2. Change directory `cd nsL``
+2. Change directory `cd nsL`
 3. Build JAR `ant jar`
 
 # Alpha Releases
@@ -47,3 +49,6 @@ prior to installing the nsL Assembler.
 
 1.0.0 - 26th March 2011
 * First public release.
+
+[Java]: https://java.com/en/download/
+[Ant]: https://ant.apache.org/
