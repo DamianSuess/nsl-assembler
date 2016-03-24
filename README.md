@@ -19,7 +19,7 @@ The only pre-requistes for building are [Java][java] and [Ant][ant].
 
 This work is licensed under the [The GNU General Public License, Version 2](LICENSE.md).
 
-## Alpha Releases
+## Changelog
 
 1.0.3 - 18th April 2011
 * Fixed bug resulting in `func() == true`, `func() == false`, `func() != true`
