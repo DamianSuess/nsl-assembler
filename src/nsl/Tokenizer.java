@@ -17,6 +17,7 @@ public class Tokenizer extends StreamTokenizer
   private final Reader theReader;
   private final String source;
 
+  private int prevLineNo;
   private int lineNumberAdd;
   private boolean autoPop;
 
@@ -51,6 +52,7 @@ public class Tokenizer extends StreamTokenizer
     this.theReader = reader;
     this.source = source;
 
+    this.prevLineNo = 0;
     this.lineNumberAdd = 0;
     this.autoPop = true;
   }
@@ -71,6 +73,15 @@ public class Tokenizer extends StreamTokenizer
   public String getSource()
   {
     return this.source;
+  }
+
+  /**
+   * Gets the line number that a token was read from previously.
+   * @return the line number that a token was read from previously
+   */
+  public int linenoprev()
+  {
+    return this.prevLineNo;
   }
 
   /**
@@ -215,7 +226,7 @@ public class Tokenizer extends StreamTokenizer
    * Gets the next token.
    * @return <code>true</code> if there was another token
    */
-  public boolean tokenNext()
+  public boolean tokenNext() throws NslExpectedException, NslException
   {
     return this.tokenNext(null);
   }
@@ -225,8 +236,9 @@ public class Tokenizer extends StreamTokenizer
    * @param expected the message of the exception to throw if no token exists
    * @return <code>true</code> if there was another token
    */
-  public boolean tokenNext(String expected)
+  public boolean tokenNext(String expected) throws NslExpectedException, NslException
   {
+    this.prevLineNo = lineno();
     try
     {
       boolean result = this.nextToken() != TT_EOF;
@@ -298,7 +310,7 @@ public class Tokenizer extends StreamTokenizer
    * Returns the current token as a string.
    * @return the current token as a string
    */
-  /*public String tokenToString()
+  public String tokenToString()
   {
     if (this.tokenIsWord())
       return this.sval;
@@ -307,13 +319,13 @@ public class Tokenizer extends StreamTokenizer
     if (this.tokenIsString())
       return '"' + this.sval + '"';
     return Character.toString((char)this.ttype);
-  }*/
+  }
 
   /**
    * Matches the given character and prints an error otherwise.
    * @param c the character to match
    */
-  public void matchOrDie(char c)
+  public void matchOrDie(char c) throws NslExpectedException, NslException
   {
     if (!this.tokenIs(c))
       throw new NslExpectedException("\"" + c + "\"");
@@ -324,7 +336,7 @@ public class Tokenizer extends StreamTokenizer
    * Matches the given word and prints an error otherwise.
    * @param word the word to match
    */
-  public void matchOrDie(String word)
+  public void matchOrDie(String word) throws NslExpectedException, NslException
   {
     if (!this.tokenIs(word))
       throw new NslExpectedException("\"" + word + "\"");
@@ -336,7 +348,7 @@ public class Tokenizer extends StreamTokenizer
    * @param c the character to match
    * @return <code>true</code> on success
    */
-  public boolean match(char c)
+  public boolean match(char c) throws NslException
   {
     if (this.tokenIs(c))
     {
@@ -351,7 +363,7 @@ public class Tokenizer extends StreamTokenizer
    * @param word the word to match
    * @return <code>true</code> on success
    */
-  public boolean match(String word)
+  public boolean match(String word) throws NslException
   {
     if (this.tokenIs(word))
     {
@@ -365,9 +377,9 @@ public class Tokenizer extends StreamTokenizer
    * Matches a semicolon on the end of the current line or prints an error
    * otherwise.
    */
-  public void matchEolOrDie()
+  public void matchEolOrDie() throws NslExpectedException, NslException
   {
-    if (!this.tokenIs(';'))
+    if (!this.tokenIs(';') || this.lineno() != this.prevLineNo)
       throw new NslExpectedException("\";\"");
     this.tokenNext();
   }
@@ -377,7 +389,7 @@ public class Tokenizer extends StreamTokenizer
    * @return the word if the current token was a word, or <code>null</code>
    * otherwise
    */
-  public String matchAWord()
+  public String matchAWord() throws NslException
   {
     return this.matchAWord(null);
   }
@@ -388,7 +400,7 @@ public class Tokenizer extends StreamTokenizer
    * @return the word if the current token was a word, or <code>null</code>
    * otherwise
    */
-  public String matchAWord(String expected)
+  public String matchAWord(String expected) throws NslException
   {
     if (this.tokenIsWord())
     {
@@ -406,7 +418,7 @@ public class Tokenizer extends StreamTokenizer
    * @return the string if the current token was a string, or <code>null</code>
    * otherwise
    */
-  public String matchAString()
+  public String matchAString() throws NslException
   {
     return this.matchAString(null);
   }
@@ -417,7 +429,7 @@ public class Tokenizer extends StreamTokenizer
    * @return the string if the current token was a string, or <code>null</code>
    * otherwise
    */
-  public String matchAString(String expected)
+  public String matchAString(String expected) throws NslException
   {
     if (this.tokenIsString())
     {
