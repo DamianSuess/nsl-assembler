@@ -25,7 +25,6 @@ public class NSISDirective extends Statement
   public NSISDirective()
   {
     this.nsis = ScriptParser.tokenizer.readUntil("#nsisend");
-    ScriptParser.tokenizer.tokenNext();
 
     this.macroEvaluated = MacroEvaluated.getCurrent();
     if (this.macroEvaluated != null)

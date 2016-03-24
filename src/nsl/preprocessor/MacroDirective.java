@@ -44,11 +44,8 @@ public class MacroDirective extends Statement
         ScriptParser.tokenizer.matchOrDie(',');
       }
     }
-    
-    String contents = ScriptParser.tokenizer.readUntil("#macroend");
-    ScriptParser.tokenizer.tokenNext();
 
-    if (!MacroList.getCurrent().add(new Macro(name, paramsList.toArray(new String[0]), macroLine, contents)))
+    if (!MacroList.getCurrent().add(new Macro(name, paramsList.toArray(new String[0]), macroLine, ScriptParser.tokenizer.readUntil("#macroend"))))
       throw new NslException("Macro \"" + name + "\" already defined with " + paramsList.size() + " parameters", macroLine);
   }
 

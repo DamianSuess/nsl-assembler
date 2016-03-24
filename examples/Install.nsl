@@ -1,7 +1,5 @@
-#define Version '1.0.1'
-
-Name("nsL Assembler ".Version." (Alpha)");
-OutFile("nsL-Assembler-".Version.".exe");
+Name("nsL Assembler");
+OutFile("nsL-Assembler-1.0.0.exe");
 XPStyle("on");
 SetCompressor("lzma", true);
 RequestExecutionLevel("admin");
@@ -15,7 +13,7 @@ uninstall page InstFiles();
 
 function .onInit()
 {
-  $INSTDIR = ReadRegStr("HKLM", @"Software\NSIS", "");
+  $INSTDIR = ReadRegStr("HKLM", "Software\\NSIS", "");
   if (StrCmp($INSTDIR, ""))
   {
     MessageBox("MB_OK|MB_ICONEXCLAMATION", "NSIS is not installed on this machine. Setup will now exit.");
@@ -27,35 +25,35 @@ section Install("nsL Assembler", true)
 {
   // Extract the main JAR file.
   SetOutPath($INSTDIR."\\NSL");
-  File(@"..\dist\nsL.jar");
+  File("..\\dist\\nsL.jar");
 
   // Extract documents.
   SetOutPath($INSTDIR."\\Docs\\NSL");
-  File(@"..\..\Reference.pdf");
-  File(@"..\..\functions.txt");
+  File("..\\..\\Reference.pdf");
+  File("..\\..\\functions.txt");
 
   // Add the right click "Compile nsL Script" option.
   WriteRegStr("HKCR", ".nsl", "", "nsL.Script");
   WriteRegStr("HKCR", "nsL.Script", "", "nsL Script File");
-  WriteRegStr("HKCR", @"nsL.Script\DefaultIcon", "", $INSTDIR.@"\makensisw.exe,1");
-  WriteRegStr("HKCR", @"nsL.Script\shell", "", "open");
-  WriteRegStr("HKCR", @"nsL.Script\shell\open\command", "", 'notepad.exe "%1"');
-  WriteRegStr("HKCR", @"nsL.Script\shell\compile", "", "Compile nsL Script");
-  WriteRegStr("HKCR", @"nsL.Script\shell\compile\command", "", '"'.$INSTDIR.@'\NSL\nsL.bat" "%1"');
+  WriteRegStr("HKCR", "nsL.Script\\DefaultIcon", "", $INSTDIR."\\makensisw.exe,1");
+  WriteRegStr("HKCR", "nsL.Script\\shell", "", "open");
+  WriteRegStr("HKCR", "nsL.Script\\shell\\open\\command", "", 'notepad.exe "%1"');
+  WriteRegStr("HKCR", "nsL.Script\\shell\\compile", "", "Compile nsL Script");
+  WriteRegStr("HKCR", "nsL.Script\\shell\\compile\\command", "", '"'.$INSTDIR.'\\NSL\\nsL.bat" "%1"');
 
   // Write our batch file that runs scripts.
   ClearErrors();
-  $R0 = FileOpen($INSTDIR.@"\NSL\nsL.bat", "w");
+  $R0 = FileOpen($INSTDIR."\\NSL\\nsL.bat", "w");
   if (!Errors())
   {
     FileWrite($R0, "cd %~dp0\r\n");
     FileWrite($R0, "java.exe -jar nsL.jar %1\r\n");
     FileClose($R0);
   }
-  DetailPrint("Wrote: ".$INSTDIR.@"\NSL\nsL.bat");
+  DetailPrint("Wrote: ".$INSTDIR."\\NSL\\nsL.bat");
 
   // Output the uninstall executable.
-  WriteUninstaller($INSTDIR.@"\NSL\Uninstall.exe");
+  WriteUninstaller($INSTDIR."\\NSL\\Uninstall.exe");
 
   // Refresh Windows Explorer.
   #define SHCNE_ASSOCCHANGED 0x8000000
@@ -66,18 +64,18 @@ section Install("nsL Assembler", true)
 section Examples("Example Scripts")
 {
   SetOutPath($INSTDIR."\\Examples\\NSL");
-  FileRecursive(@"..\examples\*.nsl");
+  FileRecursive("..\\examples\\*.nsl");
 }
 
 section Source("Java Source Code", false, true)
 {
-  SetOutPath($INSTDIR.@"\NSL\src");
-  FileRecursive(@"..\nbproject");
-  FileRecursive(@"..\src");
-  FileRecursive(@"..\test");
-  File(@"..\build.xml");
-  File(@"..\manifest.mf");
-  File(@"..\..\Reference.docx");
+  SetOutPath($INSTDIR."\\NSL\\src");
+  FileRecursive("..\\nbproject");
+  FileRecursive("..\\src");
+  FileRecursive("..\\test");
+  File("..\\build.xml");
+  File("..\\manifest.mf");
+  File("..\\..\\Reference.docx");
 }
 
 uninstall function .onInit()
@@ -93,7 +91,7 @@ uninstall function .onInit()
 uninstall section Uninstall()
 {
   // Remove our files.
-  RMDirRecursive($INSTDIR.@"\..\Docs\NSL");
+  RMDirRecursive($INSTDIR."\\..\\Docs\\NSL");
   RMDirRecursive($INSTDIR);
 
   // Delete our Windows registry entries.

@@ -172,17 +172,9 @@ public class Tokenizer extends StreamTokenizer
     String text = "";
     try
     {
-      int c = 0;
-      while (true)
+      int b, c = 0;
+      while ((b = this.theReader.read()) != -1)
       {
-        int b = this.theReader.read();
-
-        if (b == -1)
-        {
-          this.ttype = TT_EOF;
-          throw new NslExpectedException(match);
-        }
-
         if (b == '\r')
         {
           this.lineNumberAdd++;
@@ -191,7 +183,6 @@ public class Tokenizer extends StreamTokenizer
           b = this.theReader.read();
           continue;
         }
-
         if (b == '\n')
         {
           this.lineNumberAdd++;
@@ -205,7 +196,7 @@ public class Tokenizer extends StreamTokenizer
           c++;
           if (c == matchChars.length)
           {
-            text = text.substring(0, text.length() - matchChars.length + 1);
+            text = text.substring(0, text.length() - matchChars.length);
             break;
           }
         }
@@ -214,6 +205,8 @@ public class Tokenizer extends StreamTokenizer
 
         text += (char)b;
       }
+
+      ScriptParser.tokenizer.tokenNext();
     }
     catch (IOException ex)
     {
@@ -259,43 +252,15 @@ public class Tokenizer extends StreamTokenizer
         {
           this.ttype = TT_NUMBER;
 
-          try
+          if (this.sval.length() > 1 && this.sval.charAt(1) == 'x')
           {
-            if (this.sval.length() > 1 && this.sval.startsWith("0x"))
-            {
-              this.nval = Integer.parseInt(this.sval.substring(2), 16);
-            }
-            else
-            {
-              this.nval = Integer.parseInt(this.sval);
-            }
+            this.nval = Integer.parseInt(this.sval.substring(2), 16);
           }
-          catch (NumberFormatException ex)
+          else
           {
-            throw new NslException(ex.getMessage(), true);
+            this.nval = Integer.parseInt(this.sval);
           }
         }
-      }
-
-      // String with no escape sequences.
-      if (this.ttype == '@')
-      {
-        int b = this.theReader.read();
-
-        if (b == -1)
-        {
-          this.ttype = TT_EOF;
-          throw new NslExpectedException("a string");
-        }
-
-        this.ttype = (char)b;
-
-        if (b != '"' && b != '\'' && b != '`')
-        {
-          throw new NslExpectedException("a string");
-        }
-
-        this.sval = readUntil(String.valueOf((char)b));
       }
 
       return result;
