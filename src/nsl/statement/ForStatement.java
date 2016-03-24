@@ -48,7 +48,7 @@ public class ForStatement extends Statement
     if (!ScriptParser.tokenizer.match(';'))
     {
       this.booleanExpression = Expression.matchComplex();
-      if (this.booleanExpression.getType() != ExpressionType.Boolean)
+      if (!this.booleanExpression.getType().equals(ExpressionType.Boolean))
         throw new NslException("A \"for\" statement requires a Boolean expression for its condition", true);
       ScriptParser.tokenizer.matchOrDie(';');
     }

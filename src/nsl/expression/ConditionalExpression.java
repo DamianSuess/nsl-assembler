@@ -13,8 +13,6 @@ import nsl.*;
  */
 public abstract class ConditionalExpression extends LogicalExpression
 {
-  protected boolean negate;
-
   /**
    * Class constructor specifying the left and right operands and the operator.
    * @param leftOperand the left operand
@@ -25,25 +23,6 @@ public abstract class ConditionalExpression extends LogicalExpression
   {
     super(leftOperand, operator, rightOperand);
     this.type = ExpressionType.Boolean;
-    this.negate = false;
-  }
-
-  /**
-   * Sets the logical negate (!) flag.
-   * @param negate the new value
-   */
-  public void setNegate(boolean negate)
-  {
-    this.negate = negate;
-  }
-
-  /**
-   * Gets the logical negate (!) flag.
-   * @return the not flag
-   */
-  public boolean getNegate()
-  {
-    return this.negate;
   }
 
   /**

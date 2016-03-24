@@ -422,7 +422,11 @@ public abstract class Statement
           throw new NslContextException(EnumSet.of(NslContext.Section, NslContext.Function), "plug-in call");
       }
 
-      addGlobal(statement);
+      // Add the statement to the global statements list and then match another
+      // statement. If we are assigning "" to a variable then there is no need
+      // to assemble anything. Registers are always initialized to "" in NSIS.
+      if (!(statement instanceof AssignmentStatement) || !ExpressionType.isString(((AssignmentStatement)statement).getExpression()) || !((AssignmentStatement)statement).getExpression().getStringValue().isEmpty())
+        addGlobal(statement);
       return match();
     }
 

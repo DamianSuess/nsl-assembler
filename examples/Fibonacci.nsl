@@ -1,5 +1,7 @@
-OutFile("Test.exe");
+OutFile("Fibonacci.exe");
 ShowInstDetails("show");
+XPStyle("on");
+RequestExecutionLevel("admin");
 
 /*
   Modified from http://introcs.cs.princeton.edu/23recursion/Fibonacci.java.html

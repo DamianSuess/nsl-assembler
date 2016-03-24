@@ -5,8 +5,11 @@
 package nsl.expression;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import nsl.Label;
+import nsl.NslException;
 import nsl.Register;
+import nsl.statement.SwitchCaseStatement;
 
 /**
  * An NSIS instruction which performs jumps.
@@ -38,6 +41,28 @@ public abstract class JumpExpression extends ComparisonExpression
   public abstract void assemble(Label gotoA, Label gotoB) throws IOException;
 
   /**
+   * Assembles the source code.
+   * @param switchCases a list of {@link SwitchCaseStatement} in the switch
+   * statement
+   * statement that this {@code JumpExpression} is being switched on.
+   */
+  public abstract void assemble(ArrayList<SwitchCaseStatement> switchCases) throws IOException;
+
+  /**
+   * Checks whether the switch cases are valid for this type of
+   * {@code JumpExpression}.
+   * @param the line number of the switch statement
+   * @param switchCases a list of {@link SwitchCaseStatement} in the switch
+   * statement
+   */
+  public void checkSwitchCases(ArrayList<SwitchCaseStatement> switchCases, int switchLineNo)
+  {
+    for (SwitchCaseStatement caseStatement : switchCases)
+      if (!caseStatement.getMatch().type.equals(ExpressionType.Boolean))
+        throw new NslException("Invalid \"case\" value of " + caseStatement.getMatch(), caseStatement.getLineNo());
+  }
+
+  /**
    * Attempts to optimise the jump expression.
    *
    * For example, Silent() == true becomes:
@@ -53,14 +78,15 @@ public abstract class JumpExpression extends ComparisonExpression
    * We reduce 5 instructions into 1 and save a register!
    *
    * @param returnCheck the return check expression
+   * @param operator the operator being used
    * @return <code>true</code> if the expression could be optimised
    */
-  public boolean optimise(Expression returnCheck)
+  public boolean optimise(Expression returnCheck, String operator)
   {
-    if (returnCheck.getType() == ExpressionType.Boolean)
+    if (returnCheck.type.equals(ExpressionType.Boolean))
     {
       this.thrownAwayAfterOptimise = returnCheck;
-      this.booleanValue = returnCheck.getBooleanValue();
+      this.booleanValue = operator.equals("==") ? returnCheck.getBooleanValue() : !returnCheck.getBooleanValue();
       return true;
     }
     return false;

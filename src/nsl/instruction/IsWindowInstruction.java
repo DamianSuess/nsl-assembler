@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import nsl.*;
 import nsl.expression.*;
+import nsl.statement.SwitchCaseStatement;
 
 /**
  * @author Stuart
@@ -59,7 +60,10 @@ public class IsWindowInstruction extends JumpExpression
     if (this.thrownAwayAfterOptimise != null)
       AssembleExpression.assembleIfRequired(this.thrownAwayAfterOptimise);
 
-    ScriptParser.writeLine(name + " " + this.hWnd + " 0 +3");
+    if (this.booleanValue)
+      ScriptParser.writeLine(name + " " + this.hWnd + " 0 +3");
+    else
+      ScriptParser.writeLine(name + " " + this.hWnd + " +3");
     ScriptParser.writeLine("StrCpy " + var + " true");
     ScriptParser.writeLine("Goto +2");
     ScriptParser.writeLine("StrCpy " + var + " false");
@@ -82,5 +86,39 @@ public class IsWindowInstruction extends JumpExpression
       ScriptParser.writeLine(name + " " + this.hWnd + " " + gotoA + " " + gotoB);
     else
       ScriptParser.writeLine(name + " " + this.hWnd + " " + gotoB + " " + gotoA);
+  }
+
+  /**
+   * Assembles the source code.
+   * @param switchCases a list of {@link SwitchCaseStatement} in the switch
+   * statement
+   * statement that this {@code JumpExpression} is being switched on.
+   */
+  public void assemble(ArrayList<SwitchCaseStatement> switchCases) throws IOException
+  {
+    if (this.thrownAwayAfterOptimise != null)
+      AssembleExpression.assembleIfRequired(this.thrownAwayAfterOptimise);
+
+    String gotoA = "";
+    String gotoB = "";
+
+    for (SwitchCaseStatement caseStatement : switchCases)
+    {
+      if (caseStatement.getMatch().getBooleanValue() == this.booleanValue)
+      {
+        if (gotoA.isEmpty())
+          gotoA = " " + caseStatement.getLabel();
+      }
+      else
+      {
+        if (gotoB.isEmpty())
+          gotoB = " " + caseStatement.getLabel();
+      }
+    }
+
+    if (gotoA.isEmpty())
+      gotoA = " 0";
+
+    ScriptParser.writeLine(name + gotoA + gotoB);
   }
 }

@@ -45,7 +45,7 @@ public class LicenseBkColorInstruction extends AssembleExpression
   public void assemble() throws IOException
   {
     AssembleExpression.assembleIfRequired(this.value);
-    if (this.value.getType() == ExpressionType.Boolean)
+    if (this.value.getType().equals(ExpressionType.Boolean))
     {
       if (this.value.getBooleanValue() == true)
         ScriptParser.writeLine(name + " /gray");

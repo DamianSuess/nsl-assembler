@@ -37,7 +37,7 @@ public class FileSeekInstruction extends AssembleExpression
       throw new NslArgumentException(name, 2, 3);
 
     this.handle = paramsList.get(0);
-    if (this.handle.getType() != ExpressionType.Register)
+    if (!this.handle.getType().equals(ExpressionType.Register))
       throw new NslArgumentException(name, 1, ExpressionType.Register);
 
     this.offset = paramsList.get(1);

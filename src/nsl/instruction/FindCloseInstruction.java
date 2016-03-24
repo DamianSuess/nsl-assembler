@@ -34,7 +34,7 @@ public class FindCloseInstruction extends AssembleExpression
       throw new NslArgumentException(name, 1);
 
     this.handle = paramsList.get(0);
-    if (this.handle.getType() != ExpressionType.Register)
+    if (!this.handle.getType().equals(ExpressionType.Register))
       throw new NslArgumentException(name, 1, ExpressionType.Register);
   }
 

@@ -34,7 +34,7 @@ public class AssignmentExpression extends LogicalExpression
     this.type = ExpressionType.Register;
     this.integerValue = registerIndex;
 
-    if (rightOperand.type == ExpressionType.Register)
+    if (rightOperand.type.equals(ExpressionType.Register))
       Scope.getCurrent().check(rightOperand.integerValue);
   }
 

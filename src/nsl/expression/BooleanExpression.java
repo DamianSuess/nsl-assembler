@@ -45,7 +45,7 @@ public class BooleanExpression extends ConditionalExpression
    */
   private static boolean isBooleanExpression(Expression expression)
   {
-    return expression instanceof BooleanExpression || expression instanceof ComparisonExpression;
+    return expression instanceof BooleanExpression || expression instanceof ComparisonExpression || expression.type.equals(ExpressionType.Boolean);
   }
 
   /**
@@ -55,7 +55,7 @@ public class BooleanExpression extends ConditionalExpression
   @Override
   public void assemble(Register var) throws IOException
   {
-    this.assemble(new RelativeJump("0"), new RelativeJump("+3"));
+    this.assemble(RelativeJump.Zero, new RelativeJump("+3"));
     ScriptParser.writeLine("StrCpy " + var + " true");
     ScriptParser.writeLine("Goto +2");
     ScriptParser.writeLine("StrCpy " + var + " false");
@@ -72,6 +72,11 @@ public class BooleanExpression extends ConditionalExpression
     if (expression.isLiteral())
     {
       AssembleExpression.assembleIfRequired(expression);
+
+      if (expression.booleanValue == true)
+        ScriptParser.writeLine("Goto " + gotoA);
+      else
+        ScriptParser.writeLine("Goto " + gotoB);
     }
     else if (expression instanceof ConditionalExpression)
     {
@@ -92,7 +97,7 @@ public class BooleanExpression extends ConditionalExpression
   public void assemble(Label gotoA, Label gotoB) throws IOException
   {
     // Switch the labels around if we the negate (!) operator was used.
-    if (this.negate)
+    if (this.booleanValue)
     {
       Label gotoTemp = gotoA;
       gotoA = gotoB;
@@ -103,12 +108,12 @@ public class BooleanExpression extends ConditionalExpression
     {
       if (this.operator.getOperator().equals("&&"))
       {
-        ((ConditionalExpression)this.leftOperand).assemble(new RelativeJump("0"), gotoB);
+        ((ConditionalExpression)this.leftOperand).assemble(RelativeJump.Zero, gotoB);
         ((ConditionalExpression)this.rightOperand).assemble(gotoA, gotoB);
       }
       else
       {
-        ((ConditionalExpression)this.leftOperand).assemble(gotoA, new RelativeJump("0"));
+        ((ConditionalExpression)this.leftOperand).assemble(gotoA, RelativeJump.Zero);
         ((ConditionalExpression)this.rightOperand).assemble(gotoA, gotoB);
       }
     }
@@ -116,12 +121,12 @@ public class BooleanExpression extends ConditionalExpression
     {
       if (this.operator.getOperator().equals("&&"))
       {
-        ((ConditionalExpression)this.leftOperand).assemble(new RelativeJump("0"), gotoB);
+        ((ConditionalExpression)this.leftOperand).assemble(RelativeJump.Zero, gotoB);
         assemble(this.rightOperand, gotoA, gotoB);
       }
       else
       {
-        ((ConditionalExpression)this.leftOperand).assemble(gotoA, new RelativeJump("0"));
+        ((ConditionalExpression)this.leftOperand).assemble(gotoA, RelativeJump.Zero);
         assemble(this.rightOperand, gotoA, gotoB);
       }
     }
@@ -129,7 +134,9 @@ public class BooleanExpression extends ConditionalExpression
     {
       if (this.operator.getOperator().equals("&&"))
       {
-        assemble(this.leftOperand, gotoA, gotoB);
+        Label gotoC = LabelList.getCurrent().getNext();
+        assemble(this.leftOperand, gotoC, gotoB);
+        gotoC.write();
         ((ConditionalExpression)this.rightOperand).assemble(gotoA, gotoB);
       }
       else
@@ -144,15 +151,19 @@ public class BooleanExpression extends ConditionalExpression
     {
       if (this.operator.getOperator().equals("&&"))
       {
-        assemble(this.leftOperand, gotoA, gotoB);
+        Label gotoC = LabelList.getCurrent().getNext();
+        assemble(this.leftOperand, gotoC, gotoB);
+        gotoC.write();
         assemble(this.rightOperand, gotoA, gotoB);
       }
       else
       {
         Label gotoC = LabelList.getCurrent().getNext();
-        assemble(this.leftOperand, gotoA, gotoC);
+        Label gotoD = LabelList.getCurrent().getNext();
+        assemble(this.leftOperand, gotoC, gotoD);
+        gotoD.write();
+        assemble(this.rightOperand, gotoC, gotoB);
         gotoC.write();
-        assemble(this.rightOperand, gotoA, gotoB);
       }
     }
   }

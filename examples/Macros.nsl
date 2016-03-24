@@ -1,7 +1,7 @@
 OutFile("Macros.exe");
+ShowInstDetails("show");
 XPStyle("on");
 RequestExecutionLevel("admin");
-ShowInstDetails("show");
 
 section Test()
 {
@@ -44,9 +44,9 @@ section Test()
 
   // Tests return values that are jump instructions.
   if (AskQuestion("Click Yes or No?"))
-    DetailPrint("You clicked yes!");
+    DetailPrint("You clicked Yes!");
   else
-    DetailPrint("You clicked no!");
+    DetailPrint("You clicked No!");
 
   // Sets all registers being assigned to to 0. The number of registers
   // being assigned to is stored in the assembler-defined Returns macro

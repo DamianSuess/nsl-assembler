@@ -28,7 +28,7 @@ public class WhileStatement extends Statement
 
     ScriptParser.tokenizer.matchOrDie('(');
     this.booleanExpression = Expression.matchComplex();
-    if (this.booleanExpression.getType() != ExpressionType.Boolean)
+    if (!this.booleanExpression.getType().equals(ExpressionType.Boolean))
       throw new NslException("A \"while\" statement requires a Boolean expression", true);
     ScriptParser.tokenizer.matchOrDie(')');
 
@@ -64,9 +64,12 @@ public class WhileStatement extends Statement
     
     gotoLoop.write();
 
+    gotoEnd.setNotUsed(true);
+
     if (this.booleanExpression != null && this.booleanExpression instanceof ConditionalExpression)
     {
       Label gotoEnter = LabelList.getCurrent().getNext();
+      gotoEnter.setNotUsed(true);
       ((ConditionalExpression)this.booleanExpression).assemble(gotoEnter, gotoEnd);
       gotoEnter.write();
     }

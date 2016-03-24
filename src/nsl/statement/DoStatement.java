@@ -38,7 +38,7 @@ public class DoStatement extends Statement
     ScriptParser.tokenizer.matchOrDie("while");
     ScriptParser.tokenizer.matchOrDie('(');
     this.booleanExpression = Expression.matchComplex();
-    if (this.booleanExpression.getType() != ExpressionType.Boolean)
+    if (!this.booleanExpression.getType().equals(ExpressionType.Boolean))
       throw new NslException("A \"do\" statement requires a Boolean expression for its \"while\"", true);
     ScriptParser.tokenizer.matchOrDie(')');
     ScriptParser.tokenizer.matchEolOrDie();
@@ -56,7 +56,9 @@ public class DoStatement extends Statement
     Label gotoEnd = LabelList.getCurrent().getNext();
 
     gotoLoop.write();
+
     gotoLoop.setNotUsed(true);
+    gotoEnd.setNotUsed(true);
 
     Label parentBreak = CodeInfo.getCurrent().setBreakLabel(gotoEnd);
     Label parentContinue = CodeInfo.getCurrent().setContinueLabel(gotoLoop);
@@ -67,11 +69,18 @@ public class DoStatement extends Statement
     CodeInfo.getCurrent().setContinueLabel(parentContinue);
 
     if (this.booleanExpression.isLiteral() && this.booleanExpression.getBooleanValue() == true)
-      ScriptParser.writeLine("Goto " + gotoLoop);
+    {
+        ScriptParser.writeLine("Goto " + gotoLoop);
+    }
     else if (this.booleanExpression instanceof ConditionalExpression)
+    {
       ((ConditionalExpression)this.booleanExpression).assemble(gotoLoop, gotoEnd);
-    else if (gotoLoop.isNotUsed()) // Prevent makensis warning if loop label not used.
-      ScriptParser.writeLine("StrCmp 0 1 0 " + gotoLoop);
+    }
+    else if (gotoLoop.isNotUsed())
+    {
+      // Prevent makensis warning if loop label not used.
+      ScriptParser.writeLine("StrCmp \"\" \"\" 0 " + gotoLoop);
+    }
 
     gotoEnd.write();
   }

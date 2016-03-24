@@ -59,6 +59,7 @@ public class Label
   @Override
   public String toString()
   {
+    this.notUsed = false;
     return this.name;
   }
 }
