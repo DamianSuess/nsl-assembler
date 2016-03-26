@@ -3,9 +3,18 @@
 
 # nsL Assembler
 
-This installs the nsL Assembler to the NSIS directory and adds a Compile
-nsL Script right click option to `.nsl` files. [NSIS][nsis] must be installed
-prior to installing the nsL Assembler.
+nsL is a new C-like programming language for writing NSIS[nsis] installation wizards. The nsL assembler takes nsL code and translates it into original NSIS script which can then be compiled.
+
+**Features:**
+
+* Complete support for complex arithmetic and Boolean expression will all operators
+* Automatically declared un-typed variables with assemble-time scope checking
+* Native high-level constructs such as if, switch, while, do, for
+* New function, section and page declaration syntax
+* Functions, instructions and macros callable using C-style syntax
+* Built-in wrapper instructions for all NSIS instructions using new syntax
+* Recursive macros; providing assemble-time loops
+* Fast assemble speed
 
 ## Build
 
