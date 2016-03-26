@@ -18,3 +18,7 @@ The only pre-requistes for building are [Java][java] and [Ant][ant].
 ## License
 
 This work is licensed under the [The GNU General Public License, Version 2](LICENSE.md).
+
+[nsis]: https://nsis.sourceforge.net
+[java]: https://www.java.com
+[ant]: https://ant.apache.org/
