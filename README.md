@@ -3,7 +3,7 @@
 
 # nsL Assembler
 
-nsL is a new C-like programming language for writing NSIS[nsis] installation wizards. The nsL assembler takes nsL code and translates it into original NSIS script which can then be compiled.
+nsL is a new C-like programming language for writing [NSIS][nsis] installation wizards. The nsL assembler takes nsL code and translates it into original NSIS script which can then be compiled.
 
 **Features:**
 
