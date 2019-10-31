@@ -1,13 +1,11 @@
 sudo: false
-
 language: java
-addons:
-  apt:
-    packages:
-      - openjdk-6-jdk
 jdk:
   - oraclejdk9
   
-script: ant test
+before_script:
+   - sudo apt-get install ant-optional
+script: ant test -lib ./lib/junit-4.12.jar
+
 notifications:
   email: false
