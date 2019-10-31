@@ -2,8 +2,10 @@ sudo: false
 language: java
 jdk:
   - oraclejdk9
+  
 before_script:
    - sudo apt-get install ant-optional
-script: ant test
+script: ant test -lib ./lib/junit-4.12.jar
+
 notifications:
   email: false
