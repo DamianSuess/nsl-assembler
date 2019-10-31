@@ -1,7 +1,7 @@
 sudo: false
 language: java
 jdk:
-  - oraclejdk6
+  - oraclejdk9
 install: ant deps
 script: ant test
 notifications:
